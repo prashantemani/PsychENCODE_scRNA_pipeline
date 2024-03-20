@@ -56,7 +56,8 @@ def run_citeseqcount(currdir,counts_by_batch,numproc,sampledict):
         print(f"Running CellRanger count for the Antibody count matrix for sample {sampletag}")
         hashing_call = f"CITE-seq-Count -R1={hashingfastq1} -R2={hashingfastq2} -t={tags} -cbf 1 -cbl 16 -umif 17 -umil {umil} -cells {counts_by_batch[batchnum]} -T {numproc} -o {currdir+samplefolder}/CITE-seq-Results"
         print(hashing_call)
-        if not os.path.exists(f"{currdir+samplefolder}/CITE-seq-Results"):
+        #if not os.path.exists(f"{currdir+samplefolder}/CITE-seq-Results"):
+        if "Set5" in samplefolder:
             subprocess.call(hashing_call,shell=True)
         hto_count = f"{currdir+samplefolder}/CITE-seq-Results/umi_count"
         print(f"Finished running CellRanger count for the Antibody count matrix for sample {sampletag}")
@@ -108,7 +109,7 @@ if __name__=="__main__":
     count_output_list = pool.map(fix_cellr, inputdict['sampledetails'])
     pool.close()
     pool.join()
-    
+
     for output in count_output_list:
         move_outputs = f"mv {output} {currdir}"
         subprocess.call(move_outputs,shell=True)
@@ -159,9 +160,9 @@ if __name__=="__main__":
         expected_cells = int(expected_cells)
         countsdict[sampletag] = expected_cells
         if batchnum not in counts_by_batch.keys():
-            counts_by_batch[batchnum] = expected_cells+500
+            counts_by_batch[batchnum] = expected_cells+10000
         else:
-            counts_by_batch[batchnum] += expected_cells+500
+            counts_by_batch[batchnum] += expected_cells+10000
         if batchnum not in hashingdict.keys():
             hashingdict[batchnum] = [hashing]
         else:
